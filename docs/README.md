@@ -193,7 +193,7 @@
 ### HTTP Status Code 제어를 위한 Exception Handling
 - 클라이언트가 유효하지 않는 요청을 할 때 예외를 발생시키도록 구현해보자.
 - controller에서, 사용자가 요청한 id가 없을 경우 RuntimeException을 Throw 하도록 구현하였다. 결과로 500번 에러가 출력되며, trace에 서버 정보들이 그대로 노출되었다.
-- Exception에 @ResponseStatus를 통해 Status를 지정할 수 있다.
+- Exception에 @ResponseStatus를 통해 Status를 지정할 수 있다. 다만 trace에 서버 측 정보는 동일하게 노출된다.
   
 <br> 
 
@@ -204,6 +204,23 @@
 - checked Exception은 기본 트랜잭션 속성에서는 rollback을 진행하지 않는 점을 기억하자.
 - 참고 : https://cheese10yun.github.io/checked-exception/
 
+<br>
+
+### Spring AOP를 이용한 Exception Handling
+- 특정한 예외 클래스 말고, 일반화된 예외 클래스를 사용해보자.
+- ExceptionResponse 예외 클래스 생성
+- Handler class를 추가로 생성한다. controller에서 예외가 발생하면, handler 예외 클래스가 발생할 수 있도록 처리해보자.
+- 스프링에서 로깅, 로그인 정보, 어떤 메시지를 추가하는 정보와 같이, 항상 실행시켜줘야 하는 공통 항목은 AOP를 통해 공통 로직을 사용할 수 있도록 만들 수 있다.
+
+#### Response 예외 처리를 담당하는 ResponseEntityExceptionHandler
+- 해당 클래스를 확장한 컨트롤러에 Response 예외처리 담당을 부여할 수 있다.
+- @RestController + @ControllerAdvice = @RestControllerAdvice와 동일 역할이며, 이를 통해 AOP를 적용할 수 있다.
+- 강의의 CustomizedResponseEntityExceptionHandler는 결국 에러 핸들링 용도이므로 @RestController를 생략해도 된다.
+- 최종 ResponseEntity는 컨트롤러에서 반환된다. 따라서 앞서 적용했던 UserNotFoundException의 @ResponseStatus에서 적용한 응답 코드는 덮어씌워진다.
+- @ExceptionHandler(예외 클래스)를 메서드 위에 작성한다. 예외 클래스의 범위를 작성(Exception.class 또는 custom 예외)하여, 발생 예외마다 처리하는 handler를 만들 수 있다.
+- @ControllerAdvice만 적용했음에도, 반환된 ResponseEntity가 json 형식으로 출력된다. 이유는 뭘까?
+    - @ResponseBody는 HttpMessageConverter를 통해 응답 값을 자동으로 json으로 직렬화한 후 응답해주는 역할을 한다.
+    - 
 
 
 
