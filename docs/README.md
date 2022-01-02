@@ -220,7 +220,11 @@
 - @ExceptionHandler(예외 클래스)를 메서드 위에 작성한다. 예외 클래스의 범위를 작성(Exception.class 또는 custom 예외)하여, 발생 예외마다 처리하는 handler를 만들 수 있다.
 - @ControllerAdvice만 적용했음에도, 반환된 ResponseEntity가 json 형식으로 출력된다. 이유는 뭘까?
     - @ResponseBody는 HttpMessageConverter를 통해 응답 값을 자동으로 json으로 직렬화한 후 응답해주는 역할을 한다.
-    - 
+    - HttpEntity, ResponseEntity는 HttpMessageConverter로 컨버팅된다.
+    - 다른 컨버터를 등록하지 하지 않았으면 기본적으로 HttpMessageConvter의 구현체인 MappingJackson2HttpMessageConverter를 사용한다.
+    - AbstractJackson2HttpMessageConverter의 writeInternal에 의해서 호출된다.
+    - ObjectMappers 등 Jackson라이브러리를 통해 Json으로 변환하는 것을 확인할 수 있다!
+    - 즉, ResponseEntity는 메시지 컨버터에 의해 기본 json으로 반환된다.
 
 
 
