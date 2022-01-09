@@ -219,12 +219,24 @@
 - 최종 ResponseEntity는 컨트롤러에서 반환된다. 따라서 앞서 적용했던 UserNotFoundException의 @ResponseStatus에서 적용한 응답 코드는 덮어씌워진다.
 - @ExceptionHandler(예외 클래스)를 메서드 위에 작성한다. 예외 클래스의 범위를 작성(Exception.class 또는 custom 예외)하여, 발생 예외마다 처리하는 handler를 만들 수 있다.
 - @ControllerAdvice만 적용했음에도, 반환된 ResponseEntity가 json 형식으로 출력된다. 이유는 뭘까?
-    - @ResponseBody는 HttpMessageConverter를 통해 응답 값을 자동으로 json으로 직렬화한 후 응답해주는 역할을 한다.
+    - @ResponseBody는 HttpMessageConverter를 통해 응답 값을 자동으로 json으로 직렬화한 후 응답해주는 역할을 한다. 이 때는 view Resolver 대신 HttpMessageConverter가 동작한다.
     - HttpEntity, ResponseEntity는 HttpMessageConverter로 컨버팅된다.
-    - 다른 컨버터를 등록하지 하지 않았으면 기본적으로 HttpMessageConvter의 구현체인 MappingJackson2HttpMessageConverter를 사용한다.
+    - 다른 컨버터를 등록하지 하지 않았으면 기본적으로 HttpMessageConveter(얘는 인터페이스이다)의 구현체인 MappingJackson2HttpMessageConverter를 사용한다.
     - AbstractJackson2HttpMessageConverter의 writeInternal에 의해서 호출된다.
     - ObjectMappers 등 Jackson라이브러리를 통해 Json으로 변환하는 것을 확인할 수 있다!
     - 즉, ResponseEntity는 메시지 컨버터에 의해 기본 json으로 반환된다.
+    - Spring MVC는 다음의 경우에 HTTP 메시지 컨버터를 적용한다.
+         - HTTP 요청 : @RequestBody, HttpEntity(RequestEntity) : 컨트롤러가 실행되기 전에, 이들에 대해 HTTP 메시지 컨버터를 적용해서 컨트롤러로 넘긴다.
+         - HTTP 응답 : @ResponseBody, HttpEntity(ResponseEntity) : 컨트롤러의 리턴값을 HTTP 메시지 컨버터를 적용해서 응답에 넣는 역할을 한다.
+- HTTPMessageConverter는 뷰를 거치지 않고 데이터를 반환하는 처리 방식이다. byte 데이터 처리(ByteArrayHttpMessageConverter), String 데이터 처리(StringHTTPMessageConverter), 
+  객체 타입 데이터 처리(MappingJackson2HttpMessageConverter)를 수행한다.
+  
+<br>
+
+#### 사용자 삭제를 위한 API 구현 - DELETE HTTP METHOD
+- 수정하기 : PUT을 통해 업데이트 가능하다. POST랑 동일하게 파라미터를 넘기면 된다.
+- REST API : GET, POST, PUT, DELETE만 지원
+
 
 
 

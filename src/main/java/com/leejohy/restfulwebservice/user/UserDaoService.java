@@ -3,7 +3,9 @@ package com.leejohy.restfulwebservice.user;
 // 비즈니스 로직은 Service에 추가
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
@@ -35,6 +37,19 @@ public class UserDaoService {
     public User findOne(int id) {
         for (User user : users) {
             if (user.getId() == id) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    // iterator를 통한 유저 삭제
+    public User deleteById(int id) {
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            User user = iterator.next();
+            if (user.getId() == id) {
+                iterator.remove();
                 return user;
             }
         }

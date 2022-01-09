@@ -6,15 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.leejohy.restfulwebservice.user.UserNotFoundException;
 
-// @RestController
+@RestController
 @ControllerAdvice // 모든 컨트롤러 실행 시, 이 핸들러가 실행된다. 에러 발생 시 여기에서의 메서드가 실행될 수 있다.
 public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
