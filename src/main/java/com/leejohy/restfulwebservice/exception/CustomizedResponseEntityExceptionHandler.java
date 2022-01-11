@@ -2,8 +2,10 @@ package com.leejohy.restfulwebservice.exception;
 
 import java.util.Date;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,5 +32,24 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
             new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
 
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @Override // 어노테이션 추가를 통해, 메서드 명에 대한 검증을 컴파일 시점에 알아챌 수 있다.
+    /**
+     * ex : 발생한 exception 객체
+     * header : request Header
+     * status : http status
+     * request : request
+     */
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+
+        // ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(),
+        //     ex.getMessage(), ex.getBindingResult().toString());
+
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(),
+            "validation Failed", ex.getBindingResult().toString()); // time, message, details 순서
+
+        // return this.handleExceptionInternal(ex, (Object)null, headers, status, request);
+        return new ResponseEntity(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 }
