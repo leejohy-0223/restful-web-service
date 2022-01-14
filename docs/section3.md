@@ -175,3 +175,77 @@ greeting.message=Bonjour {0} {1}
 
 - xml 전달 시, ``406 Not Acceptable``이 발생한다.
 
+#### 라이브러리 추가
+- pom.xml(maven)에 다음 내용을 추가한다. 이를 통해 `mappingJackson2XmlHttpMessageConverterConfiguration`이 추가된다.
+- 이를 통해 ``HttpMessageConverter``에서 xml 사용이 가능해진다.
+````xml
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+        </dependency>
+````
+
+- 서버 재시작 후 POSTMAN으로 재 요청을 보내면 정상적으로 아래처럼``xml``출력이 리턴된다. ``json``요청도 문제 없이 동작한다.
+````xml
+<List>
+    <item>
+        <id>1</id>
+        <name>leejohy</name>
+        <joinDate>2022-01-14T09:20:47.618+00:00</joinDate>
+    </item>
+    <item>
+        <id>2</id>
+        <name>alice</name>
+        <joinDate>2022-01-14T09:20:47.618+00:00</joinDate>
+    </item>
+    <item>
+        <id>3</id>
+        <name>lucid</name>
+        <joinDate>2022-01-14T09:20:47.618+00:00</joinDate>
+    </item>
+</List>
+````
+
+<br>
+
+---
+
+### Response 데이터 제어를 위한 Filtering
+- ``password, ssn``과 같은 중요한 데이터를 제어하는 방법을 알아보자. 아래처럼 바로 클라이언트에게 반환하지 않을 방법은?
+
+![img_2.png](img_2.png)
+
+<br>
+
+#### 가장 간단한 방법
+- 특정 필드를 다른 문자로 반환해주는 방법이 있다.
+- 또는 특정 필드를 ``null``로 반환해주는 방법이 있다.
+- 하지만, 5개의 필드가 전달되는 것은 변함이 없다.
+
+<br>
+
+#### ``Springboot``에서 사용하는 jackson을 통해 제어를 해보자.
+- 특정 필드에 `@JsonIgnore`를 작성한다. 
+````java
+    @JsonIgnore
+    private String password;
+    @JsonIgnore
+    private String ssn;
+````
+
+- 결과로 아래와 같이 해당 필드가 사라져서 반환된다.
+
+![img_3.png](img_3.png)
+
+- 또는 아래처럼 `@JsonIgnoreProperties`의 `value`에 추가하여 동일한 결과를 얻을 수 있다.
+- ``Ignore``는 해당 어노테이션이 적용된 클래스를 상속받은 객체의 필드에도 마찬가지로 적용된다.
+````java
+@Data
+@AllArgsConstructor
+@JsonIgnoreProperties(value = {"password", "ssn"}) // 특정 필드에 Ignore 적용
+public class User {
+
+    private Integer id;
+    //...
+}
+````

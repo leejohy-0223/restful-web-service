@@ -1,11 +1,11 @@
 package com.leejohy.restfulwebservice.user;
 
 // 비즈니스 로직은 Service에 추가
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
@@ -15,9 +15,9 @@ public class UserDaoService {
     private static int usersCount = 3;
 
     static {
-        users.add(new User(1, "leejohy", new Date())); // 기본은 현재 시간
-        users.add(new User(2, "alice", new Date()));
-        users.add(new User(3, "lucid", new Date()));
+        users.add(new User(1, "leejohy", new Date(), "pass1", "701010-1111111")); // 기본은 현재 시간
+        users.add(new User(2, "alice", new Date(), "pass2", "801010-1111111"));
+        users.add(new User(3, "lucid", new Date(), "pass3", "901010-1111111"));
     }
 
     // 전체 사용자 조회
