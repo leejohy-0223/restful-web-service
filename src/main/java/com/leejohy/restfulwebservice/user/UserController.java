@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-// @AllArgsConstructor
 public class UserController {
     private UserDaoService service; // spring을 통한 DI로 주입받을 것이다. (bean 으로 주입받는다.)
 
@@ -30,8 +29,9 @@ public class UserController {
     }
 
     // /users/1 -> 기본은 문자 형태로 받아진다. int로 선언하면 문자가 int로 자동으로 converting 된다.
+    // retrieve : 검색하다
     @GetMapping("/users/{id}")
-    public User retrieveUser(@Valid @PathVariable int id) {
+    public User retrieveUser(@PathVariable int id) {
         User user = service.findOne(id);
 
         if (user == null) {
@@ -54,12 +54,12 @@ public class UserController {
          */
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-            .path("/{id}")// 이 부분에는 buildAndExpand를 통해 얻은 값이 들어오게된다.
+            .path("/{id}")// 이 부분에는 아래 buildAndExpand를 통해 얻은 값이 들어오게된다.
             .buildAndExpand(savedUser.getId())
             .toUri();
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.setLocation(location);
-        responseHeaders.set("myResponseHeader", "customValue");
+        // HttpHeaders responseHeaders = new HttpHeaders();
+        // responseHeaders.setLocation(location);
+        // responseHeaders.set("myResponseHeader", "customValue");
         return ResponseEntity.created(location).build(); // 빌더 패턴을 사용한 ResponseEntity
         // return new ResponseEntity<>(savedUser, responseHeaders, HttpStatus.CREATED);
     }

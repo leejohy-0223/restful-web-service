@@ -5,3 +5,8 @@ logging:
   level:
     org.springframework: DEBUG
 
+# 우리가 사용할 다국어 파일을 설정해놓는다.
+spring:
+  messages:
+    basename: messages # 우리가 사용할 기본 다국어 파일의 이름을 messages라고 지정한다.
+

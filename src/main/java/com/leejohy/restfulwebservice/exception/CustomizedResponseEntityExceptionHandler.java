@@ -9,13 +9,15 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.leejohy.restfulwebservice.user.UserNotFoundException;
 
-@RestController
-@ControllerAdvice // 모든 컨트롤러 실행 시, 이 핸들러가 실행된다. 에러 발생 시 여기에서의 메서드가 실행될 수 있다.
+// @RestController
+// @ControllerAdvice // 모든 컨트롤러 실행 시, 이 핸들러가 실행된다. 에러 발생 시 여기에서의 메서드가 실행될 수 있다.
+@RestControllerAdvice
 public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class) // 모든 예외에 대해 처리
@@ -31,16 +33,16 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         ExceptionResponse exceptionResponse =
             new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
 
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND); // 위의 CustomizedResponseEntityExceptionHandler에서 status만 변경되었다.
     }
 
-    @Override // 어노테이션 추가를 통해, 메서드 명에 대한 검증을 컴파일 시점에 알아챌 수 있다.
     /**
      * ex : 발생한 exception 객체
      * header : request Header
      * status : http status
      * request : request
      */
+    @Override // 어노테이션 추가를 통해, 메서드 명에 대한 검증을 컴파일 시점에 알아챌 수 있다.
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
         // ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(),

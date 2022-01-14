@@ -2,7 +2,6 @@ package com.leejohy.restfulwebservice.user;
 
 import java.util.Date;
 
-import javax.validation.constraints.Digits;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
