@@ -78,6 +78,8 @@ public class User {
 
 <br>
 
+---
+
 ### 다국어 처리를 위한 Internationalization 구현 방법
 - 출력 값을 여러가지 언어로 표현하는 기능이다. 
 - 다국어 처리에 대한 예시로, 우리는 웹 브라우저의 기본 설정에 따라 한국어 또는 영어 페이지를 볼 수 있다.  
@@ -163,5 +165,13 @@ greeting.message=Bonjour {0} {1}
 
 <br>
 
+---
 
+### Response 데이터 형식 변환 - XML format
+- 이번에는 ``json``이 아닌 ``xml format``으로 데이터를 반환할 것이다.
+- ``HEADER``의 ``Accept``에 ``application.xml``을 작성하고 /users를 대상으로 get 메서드를 보내보자.
+
+![img_1.png](img_1.png)
+
+- xml 전달 시, ``406 Not Acceptable``이 발생한다.
 

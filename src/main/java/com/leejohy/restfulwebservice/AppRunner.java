@@ -28,16 +28,16 @@ public class AppRunner implements ApplicationRunner {
         //     System.out.println(messageSource.getMessage("greeting.message", new String[] {"leejohy", "lucid"}, Locale.FRANCE));
         //     Thread.sleep(2000L);
         // }
-
-        while (true) {
-            System.out.println(messageSource.getClass());
-            Locale.setDefault(Locale.ROOT);
-            System.out.println(
-                messageSource.getMessage("greeting.message", new String[] {"leejohy", "lucid"}, Locale.getDefault()));
-            System.out.println(messageSource.getMessage("greeting.message", new String[] {"leejohy", "lucid"}, Locale.ENGLISH));
-            System.out.println(messageSource.getMessage("greeting.message", new String[] {"leejohy", "lucid"}, Locale.FRENCH));
-            System.out.println();
-            Thread.sleep(1000l);
-        }
+        //
+        // while (true) {
+        //     System.out.println(messageSource.getClass());
+        //     Locale.setDefault(Locale.ROOT);
+        //     System.out.println(
+        //         messageSource.getMessage("greeting.message", new String[] {"leejohy", "lucid"}, Locale.getDefault()));
+        //     System.out.println(messageSource.getMessage("greeting.message", new String[] {"leejohy", "lucid"}, Locale.ENGLISH));
+        //     System.out.println(messageSource.getMessage("greeting.message", new String[] {"leejohy", "lucid"}, Locale.FRENCH));
+        //     System.out.println();
+        //     Thread.sleep(1000l);
+        // }
     }
 }
