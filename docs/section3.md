@@ -249,3 +249,69 @@ public class User {
     //...
 }
 ````
+
+<br>
+
+---
+
+### 프로그래밍으로 제어하는 Filtering 방법 - 개별 사용자 조회
+
+클라이언트에 제공하는 필드를 어노테이션이 아닌 Jackson라이브러리를 통한 프로그래밍적인 기법으로 필터링 해보자. 앞서 사용하고 있던 `UserController`를 복사해서 사용한다.
+
+<br>
+
+1. 먼저 User에 필터될 빈의 이름을 설정한다. 이 이름을 통해 이후에 필터를 진행할 것이다.
+````java
+@JsonFilter("UserInfo")
+public class User {
+  // ...
+}
+````
+
+<br>
+
+2. 새로운 컨트롤러에 새로운 매핑을 추가한다. 
+- ``SimpleBeanPropertyFilter``를 통해 통과시킬 프로퍼티를 지정한다.
+- 이를 ``FilterProvider``에 필터빈 이름과 함께 전달한다.
+- ``MappingJacksonValue``를 만들 때 ``setFilter``를 통해 커스텀 필터를 세팅한다. 
+````java
+    @GetMapping("/users/{id}")
+    public MappingJacksonValue retrieveUser(@PathVariable int id) {
+        User user = service.findOne(id);
+
+        if (user == null) {
+            throw new UserNotFoundException(String.format("ID[%s] not found", id));
+        }
+
+        /**
+         * filter를 통해 어노테이션 대신 코드레벨에서 직관적인 제어가 가능하다.
+         * filterOutAllException으로 지정된 프로퍼티만 통과하도록 한다.
+         */
+        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter
+            .filterOutAllExcept("id", "name", "joinDate", "ssn");
+
+        // 앞서 만든 필터를 FilterProvider에게 전달한다.
+        FilterProvider filters = new SimpleFilterProvider().addFilter("UserInfo", filter);
+
+        // JacksonValue를 만들고, 여기에 FilterProvider를 세팅한다.
+        MappingJacksonValue mapping = new MappingJacksonValue(user);
+        mapping.setFilters(filters);
+
+        return mapping;
+    }
+````
+
+<br>
+
+#### 결과
+
+![img_4.png](img_4.png)
+
+필터링한 데이터만 반환된다. 앞서 ``User``에 ``JsonFilter``를 적용하였으므로, 원래 사용되던 controller 요청은 오류가 발생한다.
+
+<br>
+
+---
+
+### 프로그래밍으로 제어하는 Filtering 방법 - 전체 사용자 조회
+
