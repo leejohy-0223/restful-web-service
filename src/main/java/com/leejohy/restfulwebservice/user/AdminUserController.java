@@ -22,8 +22,18 @@ public class AdminUserController {
     }
 
     @GetMapping("/users")
-    public List<User> retrieveAllUsers() {
-        return service.findAll();
+    public MappingJacksonValue retrieveAllUsers() {
+        List<User> users = service.findAll();
+
+        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter
+            .filterOutAllExcept("id", "name", "joinDate", "ssn");
+
+        FilterProvider filters = new SimpleFilterProvider().addFilter("UserInfo", filter);
+
+        MappingJacksonValue mapping = new MappingJacksonValue(users); // 매개 변수만 변경해주면 된다.
+        mapping.setFilters(filters);
+
+        return mapping;
     }
 
     // /users/1 -> 기본은 문자 형태로 받아진다. int로 선언하면 문자가 int로 자동으로 converting 된다.

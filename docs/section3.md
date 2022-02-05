@@ -315,3 +315,28 @@ public class User {
 
 ### 프로그래밍으로 제어하는 Filtering 방법 - 전체 사용자 조회
 
+<br>
+
+이번에는 전체 사용자에 대한 필터링 작업을 진행해보자. 앞과 완전 동일하다.
+단지 ``User(한 명)``만 ``List<User> users``로 변경시켜주면 된다. 
+
+````java
+@GetMapping("/users")
+    public MappingJacksonValue retrieveAllUsers() {
+        List<User> users = service.findAll(); // 여기만 변경
+
+        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter
+            .filterOutAllExcept("id", "name", "joinDate", "ssn");
+
+        FilterProvider filters = new SimpleFilterProvider().addFilter("UserInfo", filter);
+
+        MappingJacksonValue mapping = new MappingJacksonValue(users); // 매개 변수만 변경해주면 된다.
+        mapping.setFilters(filters);
+
+        return mapping;
+    }
+
+````
+
+
+
