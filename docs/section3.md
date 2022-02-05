@@ -389,6 +389,87 @@ public class UserV2 extends User {
 
 ### Request Parameter와 Header를 이용한 API Version 관리
 
+이번에는 다른 방식으로 API 버전을 관리해보자.
 
+<br>
 
+#### Request Parameter로 관리하는 방법
 
+@GetMapping의 params에 버전을 명시해주는 방식으로 관리가 가능하다.  
+이 때 꼭 value의 맨 뒤에 슬래시(/)를 작성해줘야 한다.  
+(결과는 http://localhost:8088/admin/users/1/?version=2 처럼 활용할 수 있다.)
+````java
+    // @GetMapping("/v1/users/{id}")
+    @GetMapping(value = "/users/{id}/", params = "version=1")
+    public MappingJacksonValue retrieveUserV1(@PathVariable int id) {
+           // ...
+    }
+
+    // @GetMapping("/v2/users/{id}")
+    @GetMapping(value = "/users/{id}/", params = "version=2")
+    public MappingJacksonValue retrieveUserV2(@PathVariable int id) {
+           // ...
+    }
+````
+
+<br>
+
+#### 헤더 파라미터로 관리하는 방법
+이번에는 requestHeader에 넣어서 버전 별로 다른 결과를 얻을 수 있다.
+````java
+    // @GetMapping("/v1/users/{id}")
+    // @GetMapping(value = "/users/{id}/", params = "version=1")
+    @GetMapping(value = "/users/{id}", headers = "X-API-VERSION=1")
+    public MappingJacksonValue retrieveUserV1(@PathVariable int id) {
+       // ...
+    }
+
+    // @GetMapping("/v2/users/{id}")
+    // @GetMapping(value = "/users/{id}/", params = "version=2")
+    @GetMapping(value = "/users/{id}", headers = "X-API-VERSION=2")
+    public MappingJacksonValue retrieveUserV2(@PathVariable int id) {
+       // ...
+    }
+````
+
+<br>
+
+#### mime type(Media type versioning) 사용
+먼저 mime이란 multipurpose internet mail extension의 약자로, 파일 변환을 의미한다.
+이메일과 함께 전송되는 메일을 텍스트 문자로 전환해서 이메일 서버에 전달하기 위한 방법이다. 예전에는 이메일로 많은 데이터가 전송
+되었기 때문에 이름이 그렇게 붙여졌지만 최근에는 웹을 통해 여러 파일을 전달하기 위한 일종의 파일 형식이라고 생각하자.
+
+````java
+    // @GetMapping("/v1/users/{id}")
+    // @GetMapping(value = "/users/{id}/", params = "version=1")
+    // @GetMapping(value = "/users/{id}", headers = "X-API-VERSION=1")
+    @GetMapping(value = "/users/{id}", produces = "application/vnd.company.appv1+json")
+    public MappingJacksonValue retrieveUserV1(@PathVariable int id) {}
+
+    // @GetMapping("/v2/users/{id}")
+    // @GetMapping(value = "/users/{id}/", params = "version=2")
+    // @GetMapping(value = "/users/{id}", headers = "X-API-VERSION=2")
+    @GetMapping(value = "/users/{id}", produces = "application/vnd.company.appv2+json")
+    public MappingJacksonValue retrieveUserV2(@PathVariable int id) {}
+````
+
+![img_5.png](img_5.png)
+
+이번에는 Accept Header에 입력해서 사용할 수 있다.
+
+<br>
+
+#### 버전 관리 주의
+- URI 오염 가능성
+- Misuse of HTTP Header
+- Caching으로 인한 오류 가능성
+- 일반 브라우저에서 사용 가능 여부
+- 적절한 API Documentation 제공 필요 
+
+<br>
+
+#### Q & A
+
+파라미터로 버전 구분 처리 시 마지막에 슬래시 붙이는 이유는?  
+: 슬래시가 포함되면 디렉토리, 포함되지 않으면 파일로 인식하고 해당하는 리소스부터 검색하게 된다. 뭐 결과는 동일하게 나오는거 같다.
+https://www.inflearn.com/course/spring-boot-restful-web-services/lecture/39105?tab=community&volume=1.00&q=38698
