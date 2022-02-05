@@ -338,5 +338,57 @@ public class User {
 
 ````
 
+<br>
+
+---
+
+### URI를 이용한 REST API Version 관리 
+
+facebook, kakao 등의 API를 보면 v1, v2 등 URI에 버전이 명시되어 있는 경우가 많다. 이와 같이 자원에 대한 정보 뿐 아니라 버전을 통해 
+사용자에게 올바른 가이드를 주는게 좋다.
+
+<br>
+
+1. 먼저 버전 업을 위한 새로운 데이터 객체를 생성한다. ``grade``프로퍼티를 추가했다.
+````java
+@Data
+@AllArgsConstructor
+@JsonFilter("UserInfoV2")
+@NoArgsConstructor
+public class UserV2 extends User {
+    private String grade;
+}
+````
+
+<br>
+
+2. 새로운 데이터 객체를 매핑한다. 이 때 v2를 path에 명시하는 방식으로 버전 관리를 지정한다.  
+새로운 UserV2를 서비스에서 꺼내는 방식으로 하려면 service에 대한 코드 수정이 필요하므로, ``BeanUtils``를 활용하여 데이터를 복사하는 방식으로 구현하자.  
+마지막에 추가된 `Grade`만 set 해주면 된다.
+````java
+@GetMapping("/v2/users/{id}")
+    public MappingJacksonValue retrieveUserV2(@PathVariable int id) {
+        User user = service.findOne(id);
+
+        if (user == null) {
+            throw new UserNotFoundException(String.format("ID[%s] not found", id));
+        }
+
+        // User -> UserV2로 데이터 옮기기
+        UserV2 userV2 = new UserV2();
+        BeanUtils.copyProperties(user, userV2); // source -> target으로 복사
+        userV2.setGrade("VIP"); // 추가 데이터
+
+````
+
+3. 새로운 버전의 path로 요청한다.
+
+<br>
+
+---
+
+### Request Parameter와 Header를 이용한 API Version 관리
+
+
 
 

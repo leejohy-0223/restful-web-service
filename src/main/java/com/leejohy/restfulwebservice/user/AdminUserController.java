@@ -2,6 +2,7 @@ package com.leejohy.restfulwebservice.user;
 
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,10 +37,9 @@ public class AdminUserController {
         return mapping;
     }
 
-    // /users/1 -> 기본은 문자 형태로 받아진다. int로 선언하면 문자가 int로 자동으로 converting 된다.
-    // retrieve : 검색하다
-    @GetMapping("/users/{id}")
-    public MappingJacksonValue retrieveUser(@PathVariable int id) {
+    // GET /admin/users/1 => /admin/v1/users/1와 같이 변경됨
+    @GetMapping("/v1/users/{id}")
+    public MappingJacksonValue retrieveUserV1(@PathVariable int id) {
         User user = service.findOne(id);
 
         if (user == null) {
@@ -58,6 +58,32 @@ public class AdminUserController {
 
         // JacksonValue를 만들고, 여기에 FilterProvider를 세팅한다.
         MappingJacksonValue mapping = new MappingJacksonValue(user);
+        mapping.setFilters(filters);
+
+        return mapping;
+    }
+
+    @GetMapping("/v2/users/{id}")
+    public MappingJacksonValue retrieveUserV2(@PathVariable int id) {
+        User user = service.findOne(id);
+
+        if (user == null) {
+            throw new UserNotFoundException(String.format("ID[%s] not found", id));
+        }
+
+        // User -> UserV2로 데이터 옮기기
+        UserV2 userV2 = new UserV2();
+        BeanUtils.copyProperties(user, userV2); // source -> target으로 복사
+        userV2.setGrade("VIP"); // 추가 데이터
+
+        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter
+            .filterOutAllExcept("id", "name", "joinDate", "grade");
+
+        // 앞서 만든 필터를 FilterProvider에게 전달한다.
+        FilterProvider filters = new SimpleFilterProvider().addFilter("UserInfoV2", filter);
+
+        // JacksonValue를 만들고, 여기에 FilterProvider를 세팅한다.
+        MappingJacksonValue mapping = new MappingJacksonValue(userV2);
         mapping.setFilters(filters);
 
         return mapping;
