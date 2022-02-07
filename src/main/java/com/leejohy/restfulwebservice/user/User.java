@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 // @JsonIgnoreProperties(value = {"password", "ssn"})
-@JsonFilter("UserInfo")
+// @JsonFilter("UserInfo")
 @NoArgsConstructor // 상속하기 위해선 디폴트 생성자 구현 필요
 public class User {
 

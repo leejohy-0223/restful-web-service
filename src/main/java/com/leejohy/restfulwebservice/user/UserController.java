@@ -1,11 +1,14 @@
 package com.leejohy.restfulwebservice.user;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
 import java.net.URI;
 import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.http.HttpHeaders;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,14 +34,19 @@ public class UserController {
     // /users/1 -> 기본은 문자 형태로 받아진다. int로 선언하면 문자가 int로 자동으로 converting 된다.
     // retrieve : 검색하다
     @GetMapping("/users/{id}")
-    public User retrieveUser(@PathVariable int id) {
+    public EntityModel<User> retrieveUser(@PathVariable int id) {
         User user = service.findOne(id);
 
         if (user == null) {
             throw new UserNotFoundException(String.format("ID[%s] not found", id));
         }
 
-        return user;
+        // HATEOAS를 여기에 적용해보자.
+        EntityModel<User> model = EntityModel.of(user);
+        WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass())
+            .retrieveAllUsers());
+        model.add(linkTo.withRel("all-users")); // model에 링크를 추가(어떤 uri와 연결할 지 설정)
+        return model;
     }
 
     @PostMapping("/users") // 복수형으로 하는걸 권장. 단일 객체를 위한 uri가 아니라 users라는 데이터 리소스에 새로운 목록을 추가하기 위함이므로.
